@@ -8,7 +8,7 @@ sys.A = 0.5; sys.B = 1;
 n_ep = 20;
 seeds = randi(1e6, n_ep, 1);
 
-scenario = 'non-repetitive'; % 'non-repetitive', 'state-dependent'
+scenario = 'state-dependent'; % 'non-repetitive', 'state-dependent'
 switch scenario
     case 'repetitive'
         sys.f_dt = @(x,u,t) sys.A*x + sys.B*u + sin(0.1*pi*t);

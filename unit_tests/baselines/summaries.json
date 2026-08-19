@@ -1,0 +1,148 @@
+{
+  "lecture2": {
+    "single_integrator": {
+      "final_zoh": 4.974231123963399,
+      "final_rk4": 4.974231123963399
+    },
+    "double_integrator": {
+      "final_zoh": [4.84375, 3.4375],
+      "final_rk4": [4.84375, 3.4375]
+    },
+    "unicycle3": {
+      "goal_error": 0.16300666597846744
+    },
+    "bicycle_dynamic": {
+      "samples": 315,
+      "goal_error": 0.08916438286432614
+    }
+  },
+  "lecture3": {
+    "robot_config": "AgiBotG1RightArmDynamic1Config",
+    "end_effector_frame": "R_ee",
+    "num_joints": 7,
+    "random_joint_motion": {
+      "final_joint_displacement_norm": 0.8240089996170149,
+      "end_effector_path_length": 1.8968309786041844
+    },
+    "joint_vs_cartesian_servo": {
+      "joint_goal": [
+        0.26410166,
+        -1.3460068900000002,
+        -0.33251528000000014,
+        0.37672038,
+        0.12148081999999999,
+        -0.22263766000000002,
+        0.2
+      ],
+      "joint_final_joint_error": 0.013862152778173806,
+      "joint_final_cartesian_error": 0.008730431936007425,
+      "cartesian_final_joint_error": 0.3427283846481818,
+      "cartesian_final_cartesian_error": 0.0019222394952161691,
+      "cartesian_goal": [
+        0.5143037136565338,
+        -0.3071770573938073,
+        0.5484668060415065
+      ]
+    }
+  },
+  "lecture7/lqr": {
+    "num_executed_states": 21,
+    "final_goal_error_norm": 0.025779400946232222,
+    "final_executed_state": [
+      0.013580904356844373,
+      0.017299960920561647,
+      -0.00936779947621993,
+      -0.009648431743926976
+    ]
+  },
+  "lecture9/lqr": {
+    "num_executed_states": 11,
+    "final_goal_error_norm": 0.4301062160133831
+  },
+  "lecture9/finite_horizon_lqr": {
+    "num_executed_states": 11,
+    "final_goal_error_norm": 0.18225611941229014
+  },
+  "lecture9/linear_mpc": {
+    "num_executed_states": 11,
+    "final_goal_error_norm": 0.42812257063875153
+  },
+  "lecture7/ilqr": {
+    "num_executed_states": 151,
+    "num_planned_states": 151,
+    "final_goal_error_norm": 0.10919918719361753
+  },
+  "lecture10/linear_mpc": {
+    "num_executed_states": 31,
+    "final_goal_error_norm": 0.00048800574909798705
+  },
+  "lecture10/input_constrained_mpc": {
+    "num_executed_states": 31,
+    "final_goal_error_norm": 0.0022962399722384064
+  },
+  "lecture10/constrained_mpc": {
+    "num_executed_states": 31,
+    "final_goal_error_norm": 0.0019431959329275139
+  },
+  "lecture12": {
+    "final_error_norm": 0.7136413032180847,
+    "initial_error_norm": 2.6361550169582157,
+    "L_b": [1.0, -1.5, 0.6],
+    "L_a": [1.0]
+  },
+  "lecture13": {
+    "final_error_norm": 0.19866933079506122,
+    "initial_error_norm": 2.6361550169582157,
+    "gain_shape": [100, 101]
+  },
+  "lecture14": {
+    "max_error_y": [0.0, 2.3888586455616867],
+    "max_error_yz": [0.0, 2.220446049250313e-16],
+    "seed": 714
+  },
+  "lecture15": {
+    "measurement_error": 0.9781899690361752,
+    "kf_error": 0.8451668905586369,
+    "kfss_error": 0.8494152911891923,
+    "seed": 714
+  },
+  "lecture16": {
+    "ekf_error": 0.4141795956772892,
+    "ukf_error": 0.39950133822844247,
+    "seed": 714
+  },
+  "lecture17": {
+    "rls_final_error": 0.005047192456799965,
+    "sgd_final_error": 0.025232142417842995
+  },
+  "lecture18": {
+    "state_estimate_error": 1.254777579145132,
+    "final_state_norm": 0.45755662652028056,
+    "seed": 714
+  },
+  "lecture19": {
+    "final_state_norm": 2.235846665148341e-18,
+    "final_value": 0.09327605509832815,
+    "seed": 714
+  },
+  "lecture21": {
+    "final_rms_mc": 1.9967320662549872,
+    "final_rms_sarsa": 1.3329885276352915,
+    "final_rms_qlearning": 1.1850025065923948,
+    "seed": 714
+  },
+  "lecture22": {
+    "scenario": "non-repetitive",
+    "final_rms_reinforce": 5.265564437074637,
+    "final_rms_reinforce_bl": 0.15402120023212956,
+    "final_rms_actor_critic": 0.13694720592604462,
+    "final_ilc_error": 12.874574900777016,
+    "seed": 714
+  },
+  "lecture23": {
+    "final_rms_reinforce": 4.219223593595585,
+    "final_rms_reinforce_bl": 5.780776406404415,
+    "final_rms_actor_critic": 0.002640598890930046,
+    "seed": 714
+  }
+}
