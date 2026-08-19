@@ -1,3 +1,31 @@
+# Lecture outputs are reproducible local artifacts stored beside each lecture.
+lecture*/**/results/
+
+# Homework outputs and release packages are reproducible local artifacts.
+hw*/results/
+hw*/release/
+
 __pycache__/
-results/
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+.venv/
+venv/
+env/
+
+build/
+dist/
+*.egg-info/
+
+*.log
 .DS_Store
+
+# Local archive of superseded homework scaffolds.
+hw/
