@@ -1,0 +1,296 @@
+\section{[30pt] System}
+Consider the unicycle 4-state model. The state $x = [p_x,p_y,v,\theta]^T\in\mathbb{R}^4$ contains the 2D position $(p_x,p_y)$, the speed $v$, and the heading $\theta$ of the vehicle. The control input $u=[\dot v, \dot \theta]^T\in\mathbb{R}^2$ contains the acceleration $\dot v$ and the turning rate $\dot\theta$. The dynamic equation is
+\begin{eqnarray}\label{eq: dynamics}
+\dot x = \left[\begin{array}{c}
+v\cos\theta\\
+v\sin\theta\\
+0\\
+0
+\end{array} \right] + \left[\begin{array}{cc}
+0 & 0\\
+0 & 0\\
+1 & 0\\
+0 & 1
+\end{array} \right] u
+\end{eqnarray}
+
+{1.1 [1pt] Is this system control-affine?}
+
+\solution{\input{soln/1.1}}
+
+{1.2 [5pt] Which description is most appropriate? Choose one from each row}
+\begin{center}
+    \begin{tabular}{cc}
+Linear &   Nonlinear\\
+Continuous-Time & Discrete-Time\\
+Time-invariant & Time-varying\\
+Deterministic & Stochastic\\
+Continuous-State & Discrete-State
+\end{tabular}
+\end{center}
+
+\solution{\input{soln/1.2}}
+
+% \grading{\input{grad/1.2}}
+
+{1.3 [8pt] Linearize the system at $[p_x^r,p_y^r,v^r,\theta^r]^T$. Write down the resulting dynamics.}
+
+% \solution{\input{soln/1.3}}
+
+% \grading{\input{grad/1.3}}
+
+{1.4 [8pt] Compute the linearized system dynamics at $[1,1,0,0]^T$. Is the linearized system at this point controllable? Justify your answer.}
+
+% \solution{\input{soln/1.4}}
+
+% \grading{\input{grad/1.4}}
+
+{1.5 [8pt] Under which condition on the parameters $p_x^r, p_y^r, v^r, \theta^r$ is the linearized system controllable? Find sufficient and necessary conditions.}
+
+% \solution{\input{soln/1.5}}
+
+% \grading{\input{grad/1.5}}
+
+
+\section{[46pt] Model Mismatch}
+
+In this section, the controller imagines that the vehicle follows the unicycle
+4-state model
+
+\begin{equation}
+x_u=
+\begin{bmatrix}p_x\\p_y\\v\\\theta\end{bmatrix},
+\qquad
+u_u=
+\begin{bmatrix}\dot v\\\dot\theta\end{bmatrix},
+\end{equation}
+
+where $(p_x,p_y)$ is the position in the fixed world frame, $v$ is the forward
+speed, $\theta$ is the heading, $\dot v$ is the longitudinal acceleration, and
+$\dot\theta$ is the turning rate. The actual rollout uses the dynamic bicycle
+model supplied in \texttt{hw1/vehicle\_models.py}. Both transitions use forward
+Euler integration with time step $\Delta t=0.01\,\mathrm{s}$. Unless otherwise
+stated, use
+
+\begin{equation}
+x_u(0)=
+\begin{bmatrix}0\\0\\0.5\\0\end{bmatrix},
+\qquad
+p_g=
+\begin{bmatrix}5\\5\end{bmatrix},
+\qquad
+T=10\,\mathrm{s}.
+\end{equation}
+
+Here, $x_u(0)$ is the initial unicycle state, $p_g$ is the goal position with
+components $p_{g,x}$ and $p_{g,y}$, and $T$ is the rollout duration.
+
+\paragraph{2.1 [15pt] Unicycle feedback controller.}
+Define the goal-position error $e_p\in\mathbb{R}^2$, distance to the goal
+$\rho\in\mathbb{R}_{\geq 0}$, desired heading $\theta_d$, and wrapped heading
+error $e_\theta$ by
+
+\begin{align}
+e_p & =
+\begin{bmatrix}p_{g,x}-p_x\\p_{g,y}-p_y\end{bmatrix},
+&
+\rho & =\lVert e_p\rVert_2,\\
+\theta_d & =\tan^{-1}\!\left(\frac{e_{p,y}}{e_{p,x}}\right),
+&
+e_\theta & =\operatorname{wrap}(\theta_d-\theta)\in[-\pi,\pi).
+\end{align}
+
+Here, $\theta_d$ is the angle of the position-error vector measured from the
+positive $x$-axis. The operator $\operatorname{wrap}(\phi)$ maps an angle
+$\phi$ to $[-\pi,\pi)$. In code, compute this operation with the provided
+\texttt{wrap\_angle()} function; do not implement a separate angle-wrapping
+rule.
+
+Let $k_v>0$ be the velocity-feedback gain, $k_\theta>0$ be the
+heading-feedback gain, $v_{\max}>0$ be the maximum desired speed, and $v_d$ be
+the desired speed defined by
+
+\begin{equation}
+v_d=\min(v_{\max},\rho)\max(0,\cos e_\theta),
+\end{equation}
+
+Implement the two controller calculations
+
+\begin{equation}\label{eq:unicycle-controller}
+u_u=
+\begin{bmatrix}\dot v\\\dot\theta\end{bmatrix}
+=
+\begin{bmatrix}
+k_v(v_d-v)\\
+k_\theta e_\theta
+\end{bmatrix}.
+\end{equation}
+
+Complete \texttt{unicycle\_control} in \texttt{problem.py}. Use the default
+gains $(k_v,k_\theta)=(2.0,2.5)$, run the unicycle model, and submit the XY
+trajectory and every state-versus-time plot. Explain the purpose of each gain
+and of the factor $\max(0,\cos e_\theta)$. The supplied return lines already
+clip the acceleration and turning rate. After computing the errors and desired
+speed, you only need to calculate \texttt{v\_dot} and
+\texttt{theta\_dot}; do not add another saturation operation.
+
+% \solution{\input{soln/2.1_26fall}}
+% \grading{\input{grad/2.1_26fall}}
+
+\paragraph{2.2 [15pt] Pure-rolling bicycle command conversion.}
+The dynamic bicycle state and control follow the Lecture 2 and SPARK order
+
+\begin{equation}
+x_b=
+\begin{bmatrix}X\\Y\\v_x\\v_y\\r\\\psi\end{bmatrix},
+\qquad
+u_b=
+\begin{bmatrix}a_x\\\delta\end{bmatrix},
+\end{equation}
+
+where $(X,Y)$ is the position in the fixed world frame, $v_x$ and $v_y$ are the
+longitudinal and lateral body-frame velocities, $r=\dot\psi$ is the yaw rate,
+$\psi$ is the heading, $a_x$ is the longitudinal acceleration command, and
+$\delta$ is the front-wheel steering angle. Implement the initial-state
+conversion
+
+\begin{equation}\label{eq:state-conversion}
+x_b(0)=
+\begin{bmatrix}
+p_x(0)\\p_y(0)\\v(0)\\0\\0\\\theta(0)
+\end{bmatrix}.
+\end{equation}
+
+At each step, evaluate the Problem 2.1 controller using the virtual unicycle
+state $\widetilde{x}_u$, defined by
+
+\begin{equation}
+\widetilde{x}_u=
+\begin{bmatrix}X\\Y\\v_x\\\psi\end{bmatrix}.
+\end{equation}
+
+The actual rollout plant remains the six-state SPARK dynamic bicycle, whose
+lateral motion is generated by front and rear tire forces. For the purpose of
+converting the unicycle command only, replace those tire-force equations by
+the no-side-slip, pure-rolling approximation. Here, $\alpha_f$ and $\alpha_r$
+denote the front and rear tire slip angles, and $l_f>0$ and $l_r>0$ denote the
+distances from the vehicle center of mass to the front and rear axles,
+respectively. The pure-rolling constraints are
+
+\begin{equation}
+\alpha_f=\alpha_r=0
+\quad\Longrightarrow\quad
+v_y-l_r r=0,
+\qquad
+v_y+l_f r=v_x\tan\delta.
+\end{equation}
+
+With wheelbase $L=l_f+l_r$, these constraints give
+
+\begin{equation}
+r=\dot\psi=\frac{v_x}{L}\tan\delta.
+\end{equation}
+
+Therefore, if the shared controller returns $(\dot v,\dot\theta)$, implement
+the provided command conversion
+
+\begin{equation}\label{eq:control-conversion}
+u_b=
+\begin{bmatrix}a_x\\\delta\end{bmatrix}
+=
+\begin{bmatrix}
+\dot v\\
+\operatorname{sat}_{\delta_{\max}}
+\!\left(\tan^{-1}\!\left(\frac{L\dot\theta}{v_x}\right)\right)
+\end{bmatrix}.
+\end{equation}
+
+Here, $\delta_{\max}>0$ is the steering-angle limit and
+$\operatorname{sat}_{\delta_{\max}}(z)=
+\min(\delta_{\max},\max(-\delta_{\max},z))$.
+
+The inverse tangent is taken on its principal branch, and the conversion is
+used on the forward-motion domain $v_x>0$. The acceleration command already
+satisfies its limit from Problem 2.1. Use the pure-rolling relation only for
+the command conversion: do not replace the supplied tire-force bicycle
+transition used for the actual rollout.
+
+Complete \texttt{bicycle\_initial\_state} and \texttt{bicycle\_control}, run
+the bicycle model, and submit the XY trajectory and every state-versus-time
+plot. Explain the tracking error caused by model mismatch. Hint: relate the
+error to the bicycle's lateral velocity $v_y$ and yaw rate $r$.
+
+% \solution{\input{soln/2.2_26fall}}
+% \grading{\input{grad/2.2_26fall}}
+
+\paragraph{2.3 [16pt] Two-parameter performance analysis.}
+Use the shared controller for both models and evaluate all nine gain pairs in
+
+\begin{equation}
+k_v\in\{1.5,2.0,2.5\},
+\qquad
+k_\theta\in\{1.5,2.5,3.5\}.
+\end{equation}
+
+At matching sample indices $k$, corresponding to time $t_k=k\Delta t$, define
+the unicycle--bicycle position mismatch $e_p^{\mathrm{mm}}(k)$ and orientation
+mismatch $e_\theta^{\mathrm{mm}}(k)$ by
+
+\begin{equation}
+e_p^{\mathrm{mm}}(k)=\left\|
+\begin{bmatrix}p_{x,k}\\p_{y,k}\end{bmatrix}
+-
+\begin{bmatrix}X_k\\Y_k\end{bmatrix}
+\right\|_2,
+\qquad
+e_\theta^{\mathrm{mm}}(k)=
+\left|\operatorname{wrap}(\theta_k-\psi_k)\right|.
+\end{equation}
+
+Here, $(p_{x,k},p_{y,k},\theta_k)$ are components of the unicycle state at
+$t_k$, while $(X_k,Y_k,\psi_k)$ are components of the bicycle state at the
+same time. Use the provided \texttt{wrap\_angle()} function for the angular
+difference.
+
+Run the provided gain study and submit exactly two figures: (i) position error
+versus time and (ii) orientation error versus time. Each figure should show all
+nine gain pairs with a readable legend. Analyze how $k_v$ and $k_\theta$ affect
+the transient and final errors, and discuss whether one gain pair is uniformly
+best for both errors.
+
+% \solution{\input{soln/2.3_26fall}}
+% \grading{\input{grad/2.3_26fall}}
+
+\section{[24pt] True or False}
+
+3.1 [3pt] There is a unique equilibrium point for any system.
+
+% \solution{\input{soln/3.1}}
+
+3.2 [3pt] For linear systems, local stability implies global stability.
+
+% \solution{\input{soln/3.2}}
+
+3.3 [3pt] A stable system is bounded.
+
+% \solution{\input{soln/3.3}}
+
+3.4 [3pt] A stable system converges to its equilibrium.
+
+% \solution{\input{soln/3.4}}
+
+3.5 [3pt] Adding additional actuators to a system can always improve its controllability.
+
+% \solution{\input{soln/3.5}}
+
+3.6 [3pt] Unobservability occurs due to system stochasticity.
+
+% \solution{\input{soln/3.6}}
+
+3.7 [3pt] For a Markov process, the future state depends on the past state even when the current state and control are given.
+
+% \solution{\input{soln/3.7}}
+
+3.8 [3pt] For any nonlinear system with known model and known initial state, the future can be fully predicted by simulation.
+
+% \solution{\input{soln/3.8}}
