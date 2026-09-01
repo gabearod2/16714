@@ -1,0 +1,29 @@
+The linearized dynamics at $[1,1,0,0]^T$ are
+\begin{align}
+    \delta \dot{x} &= 
+    \begin{bmatrix}
+        0 & 0 & \cos\theta^r & -v\sin\theta^r \\
+        0 & 0 & \sin\theta^r & v\cos\theta^r \\
+        0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0
+    \end{bmatrix} \delta x + 
+    \begin{bmatrix}
+        0 & 0 \\
+        0 & 0 \\
+        1 & 0 \\
+        0 & 1
+    \end{bmatrix} \delta u \\
+    &= \begin{bmatrix}
+        0 & 0 & 1 & 0 \\
+        0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0
+    \end{bmatrix} \delta x + 
+    \begin{bmatrix}
+        0 & 0 \\
+        0 & 0 \\
+        1 & 0 \\
+        0 & 1
+    \end{bmatrix} \delta u.
+\end{align}
+This linearized system is not controllable because we have no lever to affect the $p_y$ state.

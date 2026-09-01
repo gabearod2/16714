@@ -1,0 +1,17 @@
+The resulting dynamics are defined by
+\begin{equation}
+    \delta \dot{x} = 
+    \begin{bmatrix}
+        0 & 0 & \cos\theta^r & -v\sin\theta^r \\
+        0 & 0 & \sin\theta^r & v\cos\theta^r \\
+        0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0
+    \end{bmatrix} \delta x + 
+    \begin{bmatrix}
+        0 & 0 \\
+        0 & 0 \\
+        1 & 0 \\
+        0 & 1
+    \end{bmatrix} \delta u
+\end{equation}
+where $\delta x = x - x^r$, $x^r = [p_x^r,p_y^r,v^r,\theta^r]^T$, $\delta u = u - u^r$.
