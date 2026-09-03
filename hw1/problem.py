@@ -64,7 +64,16 @@ def unicycle_control(state, config):
         theta_dot = config.heading_gain * heading_error
     else:
         # TODO(student, Problem 2.1): Implement the errors and [v_dot, theta_dot].
-        raise NotImplementedError("Implement Problem 2.1: unicycle_control")
+        # errors
+        desired_heading = np.arctan2(error[1], error[0])
+        heading_error = wrap_angle(desired_heading - heading)
+        desired_velocity = min(config.max_velocity, distance) * max(0.0, np.cos(heading_error))
+        velocity_error = desired_velocity - velocity
+
+        # control action
+        v_dot = config.velocity_gain * velocity_error
+        theta_dot = config.heading_gain * heading_error
+
     return np.array(
         [
             np.clip(v_dot, -config.max_acceleration, config.max_acceleration),
