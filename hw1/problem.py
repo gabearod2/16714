@@ -22,7 +22,6 @@ from .vehicle_models import (
     unicycle_transition,
 )
 
-
 OUTPUT_DIR = Path(__file__).resolve().parent / "results"
 VELOCITY_GAINS = (1.5, 2.0, 2.5)
 HEADING_GAINS = (1.5, 2.5, 3.5)
@@ -67,7 +66,9 @@ def unicycle_control(state, config):
         # errors
         desired_heading = np.arctan2(error[1], error[0])
         heading_error = wrap_angle(desired_heading - heading)
-        desired_velocity = min(config.max_velocity, distance) * max(0.0, np.cos(heading_error))
+        desired_velocity = min(config.max_velocity, distance) * max(
+            0.0, np.cos(heading_error)
+        )
         velocity_error = desired_velocity - velocity
 
         # control action
@@ -93,7 +94,7 @@ def bicycle_control(state, config):
     """Problem 2.2: implement the provided pure-rolling command conversion."""
     # TODO(student, Problem 2.2): Implement the conversion given in
     # problem_2.tex.
-    X,Y,v_x,v_y,r,psi = state
+    X, Y, v_x, v_y, r, psi = state
     unicycle_state = np.array([X, Y, v_x, psi])
     v_dot, theta_dot = unicycle_control(unicycle_state, config)
     a_x = v_dot
@@ -103,10 +104,10 @@ def bicycle_control(state, config):
         [
             a_x,
             np.clip(
-                delta, 
-                -DEFAULT_BICYCLE_PARAMS.steering_limit, 
-                DEFAULT_BICYCLE_PARAMS.steering_limit
-            )
+                delta,
+                -DEFAULT_BICYCLE_PARAMS.steering_limit,
+                DEFAULT_BICYCLE_PARAMS.steering_limit,
+            ),
         ]
     )
 
@@ -118,13 +119,19 @@ class ComparisonPipeline:
 
     def make_models(self):
         unicycle = DiscreteTimeDynamicsConfig(
-            4, 2, unicycle_transition, dynamics_variant="unicycle_4_state",
+            4,
+            2,
+            unicycle_transition,
+            dynamics_variant="unicycle_4_state",
             parameters={"dt": self.config.dt},
             state_names=("p_x", "p_y", "v", "theta"),
             control_names=("v_dot", "theta_dot"),
         )
         bicycle = DiscreteTimeDynamicsConfig(
-            6, 2, bicycle_transition, dynamics_variant="bicycle_dynamic_6_state",
+            6,
+            2,
+            bicycle_transition,
+            dynamics_variant="bicycle_dynamic_6_state",
             parameters=bicycle_parameters(self.config.dt),
             state_names=("X", "Y", "v_x", "v_y", "r", "psi"),
             control_names=("a_x", "delta"),
@@ -136,18 +143,28 @@ class ComparisonPipeline:
             model, initial = self.unicycle_model, self.config.initial_state
             policy = lambda state: unicycle_control(state, self.config)
         elif model_name == "bicycle":
-            model, initial = self.bicycle_model, bicycle_initial_state(self.config.initial_state)
+            model, initial = self.bicycle_model, bicycle_initial_state(
+                self.config.initial_state
+            )
             policy = lambda state: bicycle_control(state, self.config)
         else:
             raise ValueError('model_name must be "unicycle" or "bicycle".')
-        states, controls = rollout(model, policy, initial, self.config.steps, self.config.dt)
+        states, controls = rollout(
+            model, policy, initial, self.config.steps, self.config.dt
+        )
         times = np.arange(self.config.steps + 1) * self.config.dt
         return model, times, states, controls
 
     def run(self, model_name):
         model, times, states, controls = self.simulate(model_name)
         model_dir = save_model_results(
-            model_name, times, states, controls, model, self.config.goal, self.output_dir
+            model_name,
+            times,
+            states,
+            controls,
+            model,
+            self.config.goal,
+            self.output_dir,
         )
         if self.config.enable_viewer:
             viewer = ModelViewer(self.config)
@@ -158,16 +175,25 @@ class ComparisonPipeline:
         goal_error = float(np.linalg.norm(states[-1, :2] - self.config.goal))
         print(f"Saved {model_name} results to {model_dir.resolve()}")
         print(f"Final goal error: {goal_error:.3f} m")
-        return {"times": times, "states": states, "controls": controls,
-                "goal_error": goal_error, "output_dir": model_dir}
+        return {
+            "times": times,
+            "states": states,
+            "controls": controls,
+            "goal_error": goal_error,
+            "output_dir": model_dir,
+        }
 
 
 def run_gain_study(config=DEFAULT_CONFIG, output_dir=OUTPUT_DIR):
     """Provided study for Problem 2.3; students analyze the two plots."""
     traces = []
     for velocity_gain, heading_gain in product(VELOCITY_GAINS, HEADING_GAINS):
-        trial = replace(config, velocity_gain=velocity_gain,
-                        heading_gain=heading_gain, enable_viewer=False)
+        trial = replace(
+            config,
+            velocity_gain=velocity_gain,
+            heading_gain=heading_gain,
+            enable_viewer=False,
+        )
         pipeline = ComparisonPipeline(trial, output_dir)
         _, times, unicycle_x, _ = pipeline.simulate("unicycle")
         _, _, bicycle_x, _ = pipeline.simulate("bicycle")
@@ -180,7 +206,9 @@ def run_gain_study(config=DEFAULT_CONFIG, output_dir=OUTPUT_DIR):
 
 
 def run(model_name, config=DEFAULT_CONFIG, output_dir=OUTPUT_DIR, **overrides):
-    config = replace(config, **{key: value for key, value in overrides.items() if value is not None})
+    config = replace(
+        config, **{key: value for key, value in overrides.items() if value is not None}
+    )
     return ComparisonPipeline(config, output_dir).run(model_name)
 
 
@@ -188,8 +216,13 @@ def main(argv=None):
     args = parse_args(argv, OUTPUT_DIR)
     if args.gain_study:
         return run_gain_study(output_dir=args.output_dir)
-    return run(args.model, output_dir=args.output_dir, enable_viewer=args.viewer,
-               real_time=args.real_time, show_simulation_info=args.show_simulation_info)
+    return run(
+        args.model,
+        output_dir=args.output_dir,
+        enable_viewer=args.viewer,
+        real_time=args.real_time,
+        show_simulation_info=args.show_simulation_info,
+    )
 
 
 if __name__ == "__main__":
