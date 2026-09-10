@@ -85,13 +85,30 @@ def unicycle_control(state, config):
 def bicycle_initial_state(unicycle_state):
     """Problem 2.2: map [p_x,p_y,v,theta] into the bicycle state."""
     # TODO(student, Problem 2.2): Return [X,Y,v_x,v_y,r,psi].
-    raise NotImplementedError("Implement Problem 2.2: bicycle_initial_state")
+    p_x, p_y, velocity, heading = unicycle_state
+    return np.array([p_x, p_y, velocity, 0, 0, heading])
 
 
 def bicycle_control(state, config):
     """Problem 2.2: implement the provided pure-rolling command conversion."""
-    # TODO(student, Problem 2.2): Implement the conversion given in problem_2.tex.
-    raise NotImplementedError("Implement Problem 2.2: bicycle_control")
+    # TODO(student, Problem 2.2): Implement the conversion given in
+    # problem_2.tex.
+    X,Y,v_x,v_y,r,psi = state
+    unicycle_state = np.array([X, Y, v_x, psi])
+    v_dot, theta_dot = unicycle_control(unicycle_state, config)
+    a_x = v_dot
+    L = DEFAULT_BICYCLE_PARAMS.front_length + DEFAULT_BICYCLE_PARAMS.rear_length
+    delta = np.arctan(L * theta_dot / v_x)
+    return np.array(
+        [
+            a_x,
+            np.clip(
+                delta, 
+                -DEFAULT_BICYCLE_PARAMS.steering_limit, 
+                DEFAULT_BICYCLE_PARAMS.steering_limit
+            )
+        ]
+    )
 
 
 class ComparisonPipeline:

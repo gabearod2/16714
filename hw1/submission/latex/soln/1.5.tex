@@ -1,1 +1,37 @@
-$v^r \neq 0$
+The linearized system is controllable if and only if
+$\operatorname{rank}(\mathcal{C}) = n$, where $\mathcal{C}$ is the
+controllability matrix and $n$ is the number of the dimensions. Since $n=4$ for
+the unicycle model, we know the controllability matrix is
+\begin{equation*}
+    \mathcal{C} = \left[ A^3B ~ A^2B ~ AB ~ B \right].
+\end{equation*} 
+Evaluating this expression, we arrive at
+\begin{equation*}
+    \mathcal{C} = 
+    \left[\begin{array}{cc|cc|cc|cc}
+        0 & 0 & 0 & 0 & \cos\theta^r & -v^r\sin\theta^r & 0 & 0 \\
+        0 & 0 & 0 & 0 & \sin\theta^r & v^r\cos\theta^r  & 0 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
+    \end{array}\right].
+\end{equation*}
+Since the first 4 columns are zero, we can investigate the "right" $4 \times 4$
+square matrix. From the 2 bottom rows, we see they are immediately linearly
+independent, giving an immediate $\operatorname{rank}(\mathcal{C}) \geq 2$.
+Thus, we can further simplify the problem and investigate the rank of 
+\begin{equation*}
+    \mathcal{M} = 
+    \left[\begin{array}{cc}
+        \cos\theta^r & -v^r\sin\theta^r \\
+        \sin\theta^r & v^r\cos\theta^r 
+    \end{array}\right]
+\end{equation*}
+If the determinant of $\mathcal{M}$ is non-zero, then $\mathcal{M}$ itself is
+full rank, and $\operatorname{rank}(\mathcal{C}) = 4$. Thus, we evaluate 
+\begin{align*}
+    \det({\mathcal{M}}) &= v^r\cos^2\theta^r + v^r\sin^2\theta^r \\
+    &= v^r(\cos^2\theta^r + \sin^2\theta^r) \\
+    &= v^r
+\end{align*}
+Thus, $\det({\mathcal{M}}) \neq 0$ if and only if $v^r \neq 0$, and therefore,
+the system is controllable if and only if $v^r \neq 0$. 
