@@ -57,6 +57,19 @@ def _save_curve(path, x, y, *, xlabel, ylabel, title, goal=None, equal=False):
     plt.close(fig)
 
 
+def _save_overlay_curve(path, x, series, *, xlabel, ylabel, title):
+    """series: list of (label, y_values, color) tuples, all sharing x."""
+    fig, axis = plt.subplots(figsize=(5.6, 4.4))
+    for label, y, color in series:
+        axis.plot(x, y, color=color, label=label)
+    axis.set(xlabel=xlabel, ylabel=ylabel, title=title)
+    axis.grid(True)
+    axis.legend()
+    fig.tight_layout()
+    fig.savefig(path, dpi=180)
+    plt.close(fig)
+
+
 def save_model_results(model_name, times, states, controls, model, goal, output_dir):
     """Save CSV traces and one curve per figure for one model."""
     model_dir = Path(output_dir) / model_name
@@ -75,15 +88,60 @@ def save_model_results(model_name, times, states, controls, model, goal, output_
         _save_curve(model_dir / f"state_{state_name}.png", times, values,
                     xlabel="time [s]", ylabel=ylabel,
                     title=f"{model_name.title()}: {state_name} vs. time")
+
+    # No-slip check
+    if "v_y" in model.state_names and "r" in model.state_names:
+        from spark_robot import BicycleParams
+        DEFAULT_BICYCLE_PARAMS = BicycleParams()
+        v_y = states[:, model.state_names.index("v_y")]
+        r = states[:, model.state_names.index("r")]
+        _save_overlay_curve(
+            model_dir / "state_no_slip_check.png", times,
+            [
+                ("$v_y$", v_y, "tab:blue"),
+                ("$l_r r$", DEFAULT_BICYCLE_PARAMS.rear_length * r, "tab:orange"),
+            ],
+            xlabel="time [s]", ylabel="m/s",
+            title=f"{model_name.title()}: no-slip check ($v_y$ vs $l_r r$)",
+        )
     return model_dir
 
 
-def save_gain_study(times, traces, output_dir):
-    """Save position/orientation model-error histories for every gain pair."""
+# def save_gain_study(times, traces, output_dir):
+#     """Save position/orientation model-error histories for every gain pair."""
+#     study_dir = Path(output_dir) / "gain_study"
+#     study_dir.mkdir(parents=True, exist_ok=True)
+#     rows = []
+#     for velocity_gain, heading_gain, position_error, orientation_error in traces:
+#         rows.append(np.column_stack([
+#             times, np.full_like(times, velocity_gain), np.full_like(times, heading_gain),
+#             position_error, orientation_error,
+#         ]))
+#     np.savetxt(study_dir / "errors.csv", np.vstack(rows), delimiter=",",
+#                header="time,velocity_gain,heading_gain,position_error,orientation_error",
+#                comments="")
+#     for index, filename, ylabel, title in (
+#         (2, "position_error.png", "position error [m]", "Position model error"),
+#         (3, "orientation_error.png", "orientation error [rad]", "Orientation model error"),
+#     ):
+#         fig, axis = plt.subplots(figsize=(6.4, 4.8))
+#         for velocity_gain, heading_gain, *errors in traces:
+#             axis.plot(times, errors[index - 2], label=fr"$k_v={velocity_gain:g}, k_\theta={heading_gain:g}$")
+#         axis.set(xlabel="time [s]", ylabel=ylabel, title=title)
+#         axis.grid(True)
+#         axis.legend(fontsize=7, ncol=3)
+#         fig.tight_layout()
+#         fig.savefig(study_dir / filename, dpi=180)
+#         plt.close(fig)
+#     return study_dir
+
+def save_gain_study(times, traces, goal, output_dir, velocity_gains, heading_gains):
+    """Save position/orientation model-error histories and XY trajectories
+    for every gain pair."""
     study_dir = Path(output_dir) / "gain_study"
     study_dir.mkdir(parents=True, exist_ok=True)
     rows = []
-    for velocity_gain, heading_gain, position_error, orientation_error in traces:
+    for velocity_gain, heading_gain, position_error, orientation_error, *_ in traces:
         rows.append(np.column_stack([
             times, np.full_like(times, velocity_gain), np.full_like(times, heading_gain),
             position_error, orientation_error,
@@ -96,7 +154,8 @@ def save_gain_study(times, traces, output_dir):
         (3, "orientation_error.png", "orientation error [rad]", "Orientation model error"),
     ):
         fig, axis = plt.subplots(figsize=(6.4, 4.8))
-        for velocity_gain, heading_gain, *errors in traces:
+        for velocity_gain, heading_gain, *errors_and_rest in traces:
+            errors = errors_and_rest[:2]
             axis.plot(times, errors[index - 2], label=fr"$k_v={velocity_gain:g}, k_\theta={heading_gain:g}$")
         axis.set(xlabel="time [s]", ylabel=ylabel, title=title)
         axis.grid(True)
@@ -104,6 +163,35 @@ def save_gain_study(times, traces, output_dir):
         fig.tight_layout()
         fig.savefig(study_dir / filename, dpi=180)
         plt.close(fig)
+
+    # XY trajectories: one subplot per gain pair, unicycle vs bicycle path.
+    goal = np.asarray(goal)
+    n_rows, n_cols = len(velocity_gains), len(heading_gains)
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(3.6 * n_cols, 3.4 * n_rows),
+                              squeeze=False)
+    trace_lookup = {
+        (velocity_gain, heading_gain): (unicycle_xy, bicycle_xy)
+        for velocity_gain, heading_gain, _, _, unicycle_xy, bicycle_xy in traces
+    }
+    for row, velocity_gain in enumerate(velocity_gains):
+        for col, heading_gain in enumerate(heading_gains):
+            axis = axes[row][col]
+            unicycle_xy, bicycle_xy = trace_lookup[(velocity_gain, heading_gain)]
+            axis.plot(unicycle_xy[:, 0], unicycle_xy[:, 1], color="tab:blue", label="unicycle")
+            axis.plot(bicycle_xy[:, 0], bicycle_xy[:, 1], color="tab:orange",
+                       linestyle="--", label="bicycle")
+            axis.scatter(*goal, color="tab:red", marker="*", s=80, zorder=5)
+            axis.set(xlabel="x [m]", ylabel="y [m]",
+                      title=fr"$k_v={velocity_gain:g}, k_\theta={heading_gain:g}$")
+            axis.set_aspect("equal", adjustable="box")
+            axis.grid(True)
+            if row == 0 and col == 0:
+                axis.legend(fontsize=7)
+    fig.suptitle("Unicycle vs. bicycle XY trajectory per gain pair")
+    fig.tight_layout()
+    fig.savefig(study_dir / "xy_trajectories.png", dpi=180)
+    plt.close(fig)
+
     return study_dir
 
 

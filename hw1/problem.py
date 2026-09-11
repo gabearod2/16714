@@ -99,7 +99,7 @@ def bicycle_control(state, config):
     v_dot, theta_dot = unicycle_control(unicycle_state, config)
     a_x = v_dot
     L = DEFAULT_BICYCLE_PARAMS.front_length + DEFAULT_BICYCLE_PARAMS.rear_length
-    delta = np.arctan(L * theta_dot / v_x)
+    delta = np.atan(L * theta_dot / v_x)
     return np.array(
         [
             a_x,

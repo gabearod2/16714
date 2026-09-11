@@ -1,2 +1,37 @@
-\includegraphics[height=6.33cm]{../../results/gain_study/position_error.png} \\
-\includegraphics[height=6.33cm]{../../results/gain_study/orientation_error.png} 
+\\ 
+\textit{Figures.} Please see the generated plots in Figure~\ref{fig:gain_study}. 
+
+\textit{Gain discussion.} $k_v$ has the larger effect of the two gains on
+performance, determining whether the system converges without overshooting and
+having to turn back, where the model difference is much more significant. If the
+gain is too low, the controller does not keep up with the desired velocity and
+performs poorly near the final position, not slowing down fast enough. If the
+gain is high enough, however, there is not substantial difference in
+performance, only varying slightly in transient characteristics. 
+
+$k_\theta$ determines how direct the path is the final goal, with higher gains
+causing more initial overshoot (likely partly due to model mismatch), but having
+better final error. The lower gains perform better transiently but exhibit
+more steady-state error at the final orientation.
+
+There is no gain pair that performs the best across all of the errors (for both
+transient and final), so the choice should be made on desired characteristics.
+Likely, the most important error is position, so the gain pair $(k_v, k_\theta)
+= (2.5,3.5)$ would be a good choice, causing more initial overshoot in
+orientation but having good overall final error characteristics.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\linewidth}
+        \centering
+        \includegraphics[height=5.35cm]{../../results/gain_study/position_error.png}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\linewidth}
+        \centering
+        \includegraphics[height=5.35cm]{../../results/gain_study/orientation_error.png}
+    \end{subfigure}
+    \captionsetup{font={color=blue}}
+    \caption{Gain study plots.}
+    \label{fig:gain_study}
+\end{figure}

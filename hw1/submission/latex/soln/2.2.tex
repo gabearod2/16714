@@ -1,7 +1,61 @@
-\includegraphics[height=6.33cm]{../../results/bicycle/xy_trajectory.png} \\
-\includegraphics[height=6.33cm]{../../results/bicycle/state_X.png} \\
-\includegraphics[height=6.33cm]{../../results/bicycle/state_Y.png} \\
-\includegraphics[height=6.33cm]{../../results/bicycle/state_v_x.png} \\
-\includegraphics[height=6.33cm]{../../results/bicycle/state_v_y.png} \\
-\includegraphics[height=6.33cm]{../../results/bicycle/state_r.png} \\ 
-\includegraphics[height=6.33cm]{../../results/bicycle/state_psi.png} 
+Please see the generated plots in Figure~\ref{fig:bicycle_xy} and
+Figure~\ref{fig:bicycle_state}. The main gap in this model is the no-slip,
+pure-rolling approximation. If this model were to hold, we would see $v_y =
+l_rr$ for the entirety of the trajectory. This would mean there is not slip
+occurring in the true, force-based model. Plotting to see if $v_y = l_rr$ holds
+in Figure~\ref{fig:bicycle_slip}, we can see that at the beginning of the
+trajectory (where the heading error is large), this no-slip condition is in fact
+violated. This induces tracking error because the true heading is different from
+what the controller intends, causing drift in position.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=6.5cm]{../../results/bicycle/xy_trajectory.png}
+    \captionsetup{font={color=blue}}
+    \caption{XY trajectory plot.}
+    \label{fig:bicycle_xy}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=6.5cm]{../../results/bicycle/state_no_slip_check.png}
+    \captionsetup{font={color=blue}}
+    \caption{No-slip assumption plot.}
+    \label{fig:bicycle_slip}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\linewidth}
+        \centering
+        \includegraphics[height=4cm]{../../results/bicycle/state_X.png}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\linewidth}
+        \centering
+        \includegraphics[height=4cm]{../../results/bicycle/state_Y.png}
+    \end{subfigure}
+ 
+    \begin{subfigure}[b]{0.48\linewidth}
+        \centering
+        \includegraphics[height=4cm]{../../results/bicycle/state_v_x.png}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\linewidth}
+        \centering
+        \includegraphics[height=4cm]{../../results/bicycle/state_v_y.png}
+    \end{subfigure}
+
+    \begin{subfigure}[b]{0.48\linewidth}
+        \centering
+        \includegraphics[height=4cm]{../../results/bicycle/state_r.png}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\linewidth}
+        \centering
+        \includegraphics[height=4cm]{../../results/bicycle/state_psi.png}
+    \end{subfigure}
+    \captionsetup{font={color=blue}}
+    \caption{State-versus-time plots.}
+    \label{fig:bicycle_state}
+\end{figure}

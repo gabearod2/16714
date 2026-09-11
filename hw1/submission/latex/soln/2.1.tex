@@ -1,5 +1,48 @@
-\includegraphics[height=6.33cm]{../../results/unicycle/xy_trajectory.png} \\
-\includegraphics[height=6.33cm]{../../results/unicycle/state_p_x.png} \\
-\includegraphics[height=6.33cm]{../../results/unicycle/state_p_y.png} \\
-\includegraphics[height=6.33cm]{../../results/unicycle/state_theta.png} \\ 
-\includegraphics[height=6.33cm]{../../results/unicycle/state_v.png} \\ 
+Please see the generated plots in Figure~\ref{fig:unicycle_xy} and
+Figure~\ref{fig:unicycle_state}. The purpose of the gains and the factor
+$\max(0,\cos e_\theta)$ are detailed in the following bullet points.
+\begin{itemize}
+    \item $k_v$: This gain provides a feedback multiplication on the velocity
+    error. Thus, this gain drives the response in velocity tracking.
+    \item $k_\theta$: This gain provides a feedback multiplication on the
+    heading error. Thus, this gain drives the response in heading tracking.
+    \item $\max(0,\cos e_\theta)$: This maximum protects against commanding a
+    positive speed when the vehicle is pointed more than $\pi/2$ radians away
+    from the goal. In this case, we'd rather only run our heading towards to
+    target to wait until we are headed in the correct direction. Otherwise, we
+    are not moving \emph{towards} the goal position.
+\end{itemize} 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=8cm]{../../results/unicycle/xy_trajectory.png}
+    \captionsetup{font={color=blue}}
+    \caption{\color{blue}XY trajectory plot.}
+    \label{fig:unicycle_xy}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\linewidth}
+        \centering
+        \includegraphics[height=5cm]{../../results/unicycle/state_p_x.png}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\linewidth}
+        \centering
+        \includegraphics[height=5cm]{../../results/unicycle/state_p_y.png}
+    \end{subfigure}
+ 
+    \begin{subfigure}[b]{0.48\linewidth}
+        \centering
+        \includegraphics[height=5cm]{../../results/unicycle/state_theta.png}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\linewidth}
+        \centering
+        \includegraphics[height=5cm]{../../results/unicycle/state_v.png}
+    \end{subfigure}
+    \captionsetup{font={color=blue}}
+    \caption{State-versus-time plots.}
+    \label{fig:unicycle_state}
+\end{figure}
